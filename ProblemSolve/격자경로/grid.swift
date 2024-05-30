@@ -1,5 +1,3 @@
-//문해기 1차시 3번째 알고리즘
-
 import Foundation
 
 func nCr(_ num1: Int, _ num2: Int) -> Int{ return (1...(num1 + num2)).reduce(1, *) / ((1...num1).reduce(1, *) * (1...num2).reduce(1, *)) }
