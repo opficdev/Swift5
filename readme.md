@@ -8,6 +8,6 @@
 ### - ProblemSolve 
 ###### &emsp; 4학년 1학기 문제해결기법 과제로 제출했던 C++ 코드를 Swift로 리팩터링
 
-### - Portfolio
-###### &emsp; 4학년 1학기 실증적SW개발프로젝트 I 과목에 2차 제출한 포트폴리오입니다
-<img src = "/Users/opfic/Desktop/과제/24-1/졸작/포트폴리오.pdf">
+### - ![Portfolio](portfolio.pdf)
+###### &emsp; 4학년 1학기 실증적SW개발프로젝트I 과목에 2차 제출한 포트폴리오입니다
+
