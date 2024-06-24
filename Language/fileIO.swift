@@ -91,30 +91,3 @@ class fstream {
     
     
 }
-
-
-func read(_ title: String) -> [[String]]{
-    let fileURL = URL(fileURLWithPath: #file).deletingLastPathComponent().appendingPathComponent(title)
-    var lines: [[String]] = []
-    do {
-        let fileHandle = try FileHandle(forReadingFrom: fileURL)
-        
-        var fileContent = ""
-
-        let data = fileHandle.readDataToEndOfFile()
-        if let content = String(data: data, encoding: .utf8) {
-            fileContent = content
-        }
-        fileHandle.closeFile()
-        
-        let filter = fileContent.contains("\r\n") ? "\r\n" : "\n"
-        
-        lines = fileContent.split(separator: filter).map{$0.split(separator: " ").map{String($0)}}
-        
-
-    } catch {
-        print(error)
-    }
-    return lines
-}
-
