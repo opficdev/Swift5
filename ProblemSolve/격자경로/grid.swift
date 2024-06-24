@@ -1,60 +1,118 @@
 import Foundation
 
-func nCr(_ num1: Int, _ num2: Int) -> Int{ return (1...(num1 + num2)).reduce(1, *) / ((1...num1).reduce(1, *) * (1...num2).reduce(1, *)) }
+let inp = read("grid.inp")
 
-//특정 점을 꼭 한번씩 지나가야 하는 경우
-func mustPass(){
-    var answer = 1
-    var dots = dots.sorted(by: {$0[0] < $1[0] || ($0[0] == $1[0] && $0[1] < $1[1])})
-    dots.append([y-1, x-1])
+class Grid{
+    var R: Int, C: Int, A: Int, B: Int, K: Int
+    var board:[[Int]], cnt:[[[Int64]]]
     
-    var xy:[Int] = [0,0]
-    for i in dots{
-        let _x = i[0] - xy[0], _y = i[1] - xy[1]
-        answer *= nCr(_x, _y)
-        xy = i
-    }
     
-    print("mustPass : \(answer)")
-}
-
-//특정 점을 지나면 안되는 경우
-func mustnotPass(){
-    var table:[[Int]] = Array(repeating: Array(repeating: 1, count: y), count: x)
-    for i in dots{
-        let _x = i[1], _y = i[0]
-        if _x >= x || _y >= y { continue }
-        table[_x][_y] = 0
-    }
-    for i in 0..<y{
-        for j in 0..<x{
-            if table[j][i] != 0 && i > 0 && j > 0{
-                table[j][i] = table[j-1][i] + table[j][i-1]
-            }
-            else if i == 0 && j > 0{
-                if table[j-1][i] == 0{
-                    table[j][i] = 0
-                }
-            }
-            else if i > 0 && j == 0{
-                if table[j][i-1] == 0{
-                    table[j][i] = 0
-                }
-            }
+    init(_ input: [[Int]]){
+        R = input[0][0]; C = input[0][1]; A = input[0][2]; B = input[0][3]; K = input[0][4]
+        R+=1;C+=1
+        
+        board = Array(repeating: Array(repeating: -1, count: C + 1), count: R + 1)
+        for i in 0...C{
+            board[0][i] = 0
         }
+        for i in 0...R{
+            board[i][0] = 0
+        }
+        
+        cnt = Array(repeating: Array(repeating: Array(repeating: 0, count: K+1), count: C + 1), count: R + 1)
+        
+        //1 : 원 표시된 곳
+        for i in 0..<A{
+            let r = input[1][2*i] + 1, c = input[1][2*i+1] + 1
+            board[r][c] = 1
+        }
+        //0 : 지나갈 수 없는 곳
+        for i in 0..<B{
+            let r = input[2][2*i] + 1, c = input[2][2*i+1] + 1
+            board[r][c] = 0
+        }
+        
+        cnt[1][1][0] = 1
     }
-    print("mustnotPass : \(table.last!.last!)")
+    
+    func getRes() -> String{
+        return String(cnt[R][C][K])
+    }
 }
 
-let d = Int(readLine()!)!
-var dots:[[Int]] = []
+func read(_ title: String) -> [[String]]{
+    let fileURL = URL(fileURLWithPath: #file).deletingLastPathComponent().appendingPathComponent(title)
+    var lines: [[String]] = []
+    do {
+        let fileHandle = try FileHandle(forReadingFrom: fileURL)
+        
+        var fileContent = ""
 
-let xy:[Int] = readLine()!.split(separator: " ").map{Int($0)!}
-let x:Int = xy[1], y:Int = xy[0]
+        let data = fileHandle.readDataToEndOfFile()
+        if let content = String(data: data, encoding: .utf8) {
+            fileContent = content
+        }
+        fileHandle.closeFile()
+        
+        let filter = fileContent.contains("\r\n") ? "\r\n" : "\n"
+        
+        lines = fileContent.split(separator: filter).map{$0.split(separator: " ").map{String($0)}}
+        
 
-
-for _ in 0..<d{
-    dots.append(readLine()!.split(separator: " ").map{Int($0)!}) //점 입력은 인덱스번호 형태
+    } catch {
+        print(error)
+    }
+    return lines
 }
-mustPass()
-mustnotPass()
+
+func write(_ title: String, _ data: String){
+    let currentFileURL = URL(fileURLWithPath: #file)
+    let directoryURL = currentFileURL.deletingLastPathComponent()
+    let fileURL = directoryURL.appendingPathComponent(title)
+
+    do {
+        try data.write(to: fileURL, atomically: true, encoding: .utf8)
+    } catch {
+        print(error)
+    }
+}
+
+let MOD:Int64 = 1000000007
+
+@main
+struct Main{
+    static func main(){
+        let TC = Int(inp[0][0])!
+        var res = ""
+        for t in 0..<TC{
+            let data = Array(inp[3*t+1...3*t+3].map{$0.map{Int($0)!}})
+            let g = Grid(data)
+            
+            for i in 1...g.R{
+                for j in 1...g.C{
+                    if g.board[i][j] == 0{
+                        continue
+                    }
+                    
+                    if g.board[i][j] == 1{
+                        g.cnt[i][j][g.K] += g.cnt[i-1][j][g.K] + g.cnt[i][j-1][g.K]
+                        g.cnt[i][j][g.K] %= MOD
+
+                        for k in 0..<g.K{
+                            g.cnt[i][j][k+1] += g.cnt[i-1][j][k] + g.cnt[i][j-1][k]
+                            g.cnt[i][j][k+1] %= MOD
+                        }
+                    }
+                    else{
+                        for k in 0...g.K{
+                            g.cnt[i][j][k] += g.cnt[i-1][j][k] + g.cnt[i][j-1][k]
+                            g.cnt[i][j][k] %= MOD
+                        }
+                    }
+                }
+            }
+            res += g.getRes() + "\n"
+        }
+        write("grid.out", res)
+    }
+}
