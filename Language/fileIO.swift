@@ -1,107 +1,101 @@
 import Foundation
 
-class fstream {
-    private var fileHandle: FileHandle? = nil
-    private var buffer: Data
-    private let bufferSize: Int
+class fstream{
+    private let fileHandle: FileHandle
     private let fileURL: URL
-    private let mode: String
-    
-    init?(_ fileName: String, _ mode: String, bufferSize: Int = 4096) {
-        if mode != "r" && mode != "w"{
-            print("Wrong mode")
+    private let fileSize: Int
+    private let pageSize: Int
+    private var mappedPointer: UnsafeMutableRawPointer?
+    private var currentOffset: Int = 0
+
+    init?(_ fileName: String, _ path: String = #file) {
+        fileURL = URL(fileURLWithPath: path).deletingLastPathComponent().appendingPathComponent(fileName)
+
+        guard let decodedPath = fileURL.path.removingPercentEncoding else {
             return nil
         }
-        self.fileURL = URL(fileURLWithPath: #file).deletingLastPathComponent().appendingPathComponent(fileName)
-        
-        do {
-            if mode == "r"{
-                self.fileHandle = try FileHandle(forReadingFrom: self.fileURL)
-            }
-            else{
-                self.fileHandle = FileHandle() //dummy
-            }
-        } catch {
+
+        guard let fileHandle = try? FileHandle(forUpdating: fileURL),
+              let attributes = try? FileManager.default.attributesOfItem(atPath: decodedPath),
+              let fileSize = attributes[.size] as? Int else {
             return nil
         }
-        self.mode = mode
-        self.buffer = Data(capacity: bufferSize)
-        self.bufferSize = bufferSize
-     }
+
+        self.fileHandle = fileHandle
+        self.fileSize = fileSize
+        self.pageSize = Int(Darwin.getpagesize())
+
+        mapMemory()
+    }
+
     deinit {
-        if fileHandle != nil{
-            fileHandle!.closeFile()
+        unmapMemory()
+        try? fileHandle.close()
+    }
+
+    private func mapMemory() {
+        let fileDescriptor = CInt(fileHandle.fileDescriptor)
+        mappedPointer = mmap(nil, fileSize, PROT_READ, MAP_PRIVATE, fileDescriptor, 0)
+    }
+
+    private func unmapMemory() {
+        if let pointer = mappedPointer {
+            munmap(pointer, fileSize)
         }
     }
+
+    func read(_ bytes: Int) -> String? {
+        guard let pointer = mappedPointer else { return nil }
+        let remainingBytes = fileSize - currentOffset
+        let bytesToRead = min(bytes, remainingBytes)
+
+        guard bytesToRead > 0 else { return nil }
+
+        let data = Data(bytes: pointer.advanced(by: currentOffset), count: bytesToRead)
+        currentOffset += bytesToRead
+        return String(data: data, encoding: .utf8)
+    }
     
+    func read() -> String? {
+        guard let pointer = mappedPointer else { return nil }
+        return String(data: Data(bytes: pointer.advanced(by: 0), count: fileSize), encoding: .utf8)
+    }
     
+    func seek(to offset: Int) {
+        currentOffset = min(max(0, offset), fileSize)
+    }
+
+    var isEOF: Bool {
+        return currentOffset >= fileSize
+    }
+
     func readLine() -> String? {
-        guard self.mode == "r" else {
-            print("This function can use read mode only.")
-            return nil
-        }
-        var line = Data()
-        var byte: UInt8 = 0
-        
-        while true {
-            if buffer.isEmpty {
-                buffer = fileHandle!.readData(ofLength: bufferSize)
-                if buffer.isEmpty {
-                    return line.isEmpty ? nil : String(data: line, encoding: .utf8)!
-                }
-            }
+        guard let pointer = mappedPointer, !isEOF else { return nil }
 
-            byte = buffer.removeFirst()
-            
-            if byte == 10{ // 10: \n
-                return String(data: line, encoding: .utf8)!
+        var lineEnd = currentOffset
+        while lineEnd < fileSize {
+            let byte = pointer.load(fromByteOffset: lineEnd, as: UInt8.self)
+            if byte == 10 { // ASCII code for newline
+                break
             }
-            
-            if byte != 13{ //13: \r
-                line.append(byte)
+            if byte != 13{
+                lineEnd += 1
             }
         }
-    }
-    
-    func read() -> [[String]]?{
-        guard self.mode == "r" else {
-            print("This function can use read mode only.")
-            return nil
-        }
-        
-        var lines: [[String]] = []
-        do {
-            let fileHandle = try FileHandle(forReadingFrom: fileURL)
-            
-            var fileContent = ""
 
-            let data = fileHandle.readDataToEndOfFile()
-            if let content = String(data: data, encoding: .utf8) {
-                fileContent = content
-            }
-            
-            let filter = fileContent.contains("\r\n") ? "\r\n" : "\n"
-            
-            lines = fileContent.split(separator: filter).map{$0.split(separator: " ").map{String($0)}}
-            
+        let lineLength = lineEnd - currentOffset
+        let line = String(bytes: UnsafeRawBufferPointer(start: pointer.advanced(by: currentOffset), count: lineLength), encoding: .utf8)
 
-        } catch {
-            print(error)
-        }
-        return lines
+        currentOffset = min(lineEnd + 1, fileSize) // Move past the newline
+        return line
     }
     
     func write(_ data: Any){
-        guard self.mode == "w" else {
-            print("This function can use write mode only.")
-            return
-        }
-       
         do {
             let data = String(describing: data)
             try data.write(to: fileURL, atomically: true, encoding: .utf8)
         } catch {
-            print("Something wrong write data!!")
+            print("Something wrong data!!")
         }
     }
 }
