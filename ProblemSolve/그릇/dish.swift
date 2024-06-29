@@ -19,8 +19,8 @@ func Dish(_ str: String) -> String{
 @main
 struct Main{
     static func main(){
-        let fin = fstream("dish.inp", "r")!
-        let fout = fstream("dish.out", "w")!
+        let fin = fstream("dish.inp")!
+        let fout = fstream("dish.out")!
         
         let T = Int(fin.readLine()!)!
         var res = ""
