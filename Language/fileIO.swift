@@ -1,28 +1,24 @@
 import Foundation
 
-class fstream{
+class FileReader{
     private let fileHandle: FileHandle
     private let fileURL: URL
     private let fileSize: Int
     private let pageSize: Int
     private var mappedPointer: UnsafeMutableRawPointer?
     private var currentOffset: Int = 0
-
+    
     init?(_ fileName: String, _ path: String = #file) {
         self.fileURL = URL(fileURLWithPath: path).deletingLastPathComponent().appendingPathComponent(fileName)
 
         guard let decodedPath = fileURL.path.removingPercentEncoding else {
             return nil
         }
-        
-        let FM = FileManager.default
-       if !FM.fileExists(atPath: fileURL.path) {
-           FM.createFile(atPath: fileURL.path, contents: nil, attributes: nil)
-       }
 
-        guard let fileHandle = try? FileHandle(forUpdating: fileURL),
+        guard let fileHandle = try? FileHandle(forReadingFrom: self.fileURL),
               let attributes = try? FileManager.default.attributesOfItem(atPath: decodedPath),
               let fileSize = attributes[.size] as? Int else {
+            print("File: \"\(fileName)\" is not Exist!")
             return nil
         }
 
@@ -96,13 +92,20 @@ class fstream{
         currentOffset = min(lineEnd + 1, fileSize) // Move past the newline
         return line
     }
+}
+
+class FileWriter{
+    private let fileURL: URL
+    init(_ fileName: String, _ path: String = #file){
+        self.fileURL = URL(fileURLWithPath: path).deletingLastPathComponent().appendingPathComponent(fileName)
+    }
     
     func write(_ data: Any){
         do {
             let data = String(describing: data)
             try data.write(to: fileURL, atomically: true, encoding: .utf8)
         } catch {
-            print("Something wrong data!!")
+            print("Wrong Input data!!")
         }
     }
 }
