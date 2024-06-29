@@ -9,11 +9,16 @@ class fstream{
     private var currentOffset: Int = 0
 
     init?(_ fileName: String, _ path: String = #file) {
-        fileURL = URL(fileURLWithPath: path).deletingLastPathComponent().appendingPathComponent(fileName)
+        self.fileURL = URL(fileURLWithPath: path).deletingLastPathComponent().appendingPathComponent(fileName)
 
         guard let decodedPath = fileURL.path.removingPercentEncoding else {
             return nil
         }
+        
+        let FM = FileManager.default
+       if !FM.fileExists(atPath: fileURL.path) {
+           FM.createFile(atPath: fileURL.path, contents: nil, attributes: nil)
+       }
 
         guard let fileHandle = try? FileHandle(forUpdating: fileURL),
               let attributes = try? FileManager.default.attributesOfItem(atPath: decodedPath),
@@ -73,17 +78,19 @@ class fstream{
         guard let pointer = mappedPointer, !isEOF else { return nil }
 
         var lineEnd = currentOffset
+        var count13 = 0 //\r의 갯수
         while lineEnd < fileSize {
             let byte = pointer.load(fromByteOffset: lineEnd, as: UInt8.self)
             if byte == 10 { // ASCII code for newline
                 break
             }
-            if byte != 13{
-                lineEnd += 1
+            if byte == 13{
+                count13 += 1
             }
+            lineEnd += 1
         }
 
-        let lineLength = lineEnd - currentOffset
+        let lineLength = lineEnd - currentOffset - count13
         let line = String(bytes: UnsafeRawBufferPointer(start: pointer.advanced(by: currentOffset), count: lineLength), encoding: .utf8)
 
         currentOffset = min(lineEnd + 1, fileSize) // Move past the newline
