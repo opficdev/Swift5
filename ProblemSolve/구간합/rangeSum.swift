@@ -21,8 +21,8 @@ func update(_ v: inout [Int64], _ i: Int, _ diff: Int64){
 @main
 struct Main{
     static func main(){
-        let fin = fstream("rangeSum.inp")!
-        let fout = fstream("rangeSum.out")!
+        let fin = FileReader("rangeSum.inp")!
+        let fout = FileWriter("rangeSum.out")
         
         let N: Int = Int(fin.readLine()!)! + 1
         var bitree: [Int64] = Array(repeating: 0, count: N)

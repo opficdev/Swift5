@@ -19,13 +19,14 @@ func collatx(_ n:  Int64){
 @main
 struct Main{
     static func main(){
-        var res = "\n"
-        while true{
+        let fin = FileReader("3nplus1.inp")!
+        let fout = FileWriter("3nplus1.out")
+        
+        var res = ""
+        while !fin.isEOF{
             max_cnt = 0
-            let ab = readLine()!.split(separator: " ").map{Int64($0)!}
-            if (ab.count == 0) {
-                break
-            }
+            let ab = fin.readLine()!.split(separator: " ").map({Int64($0)!})
+            
             let a = ab[0], b = ab[1]
             
             for i in min(a,b)...max(a,b){
@@ -33,6 +34,6 @@ struct Main{
             }
             res += "\(a) \(b) \(max_cnt)\n"
         }
-        print(res)
+        fout.write(res)
     }
 }
