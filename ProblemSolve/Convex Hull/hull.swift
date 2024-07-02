@@ -8,7 +8,7 @@
 import Foundation
 
 struct Point: Comparable{
-    var x:Int, y: Int
+    var x: Int, y: Int
     init(_ x: Int,_ y: Int){
         self.x = x
         self.y = y
