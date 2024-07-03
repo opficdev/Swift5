@@ -38,7 +38,7 @@ class Queue<T>{
     var first: T?{
         return self.head?.data
     }
-    ///get tail
+    ///Get tail
     var last: T?{
         return self.tail?.data
     }
@@ -70,7 +70,8 @@ class Queue<T>{
         }
     }
     
-    func pop() -> T?{ ///Get data from queue and remove last node.
+    ///Get data from queue and remove last node.
+    func pop() -> T?{
         let data = first
         remove()
         return data
