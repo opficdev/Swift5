@@ -230,38 +230,31 @@ func Area(_ arr1: [Point],_ arr2: [Point]) -> Double{ //좌측 다각형 점, �
 @main
 struct Main{
     static func main(){
-        for t in 1...10{
-//            let fin = FileReader("tangent.inp")!
-            let fin = FileReader("\(t).inp")!
-            let fout = FileWriter("tangent.out")
-            
-            let T = Int(fin.readLine()!)!
-            var res = ""
-            for _ in 0..<T{
-                var arr1: [Point] = []
-                var n = Int(fin.readLine()!)!
-                for _ in 0..<n{
-                    let point = fin.readLine()!.split(separator: " ").map({Int($0)!})
-                    arr1.append(Point(point[0], point[1]))
-                }
-                var arr2: [Point] = []
-                n = Int(fin.readLine()!)!
-                for _ in 0..<n{
-                    let point = fin.readLine()!.split(separator: " ").map({Int($0)!})
-                    arr2.append(Point(point[0], point[1]))
-                }
-                
-                var area = Area(arr1, arr2)
-                if area < 0{
-                    area = Area(arr2, arr1)
-                }
-                res += String(format: "%.1f", area) + "\n";
+        let fin = FileReader("tangent.inp")!
+        let fout = FileWriter("tangent.out")
+        
+        let T = Int(fin.readLine()!)!
+        var res = ""
+        for _ in 0..<T{
+            var arr1: [Point] = []
+            var n = Int(fin.readLine()!)!
+            for _ in 0..<n{
+                let point = fin.readLine()!.split(separator: " ").map({Int($0)!})
+                arr1.append(Point(point[0], point[1]))
             }
-            fout.write(res)
+            var arr2: [Point] = []
+            n = Int(fin.readLine()!)!
+            for _ in 0..<n{
+                let point = fin.readLine()!.split(separator: " ").map({Int($0)!})
+                arr2.append(Point(point[0], point[1]))
+            }
             
-            let t0 = FileReader("\(t).out")!.read()!.replacingOccurrences(of: "\r", with: "")
-            let t1 = FileReader("tangent.out")!.read()!
-            print(t0 == t1)
+            var area = Area(arr1, arr2)
+            if area < 0{
+                area = Area(arr2, arr1)
+            }
+            res += String(format: "%.1f", area) + "\n";
         }
+        fout.write(res)
     }
 }
