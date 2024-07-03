@@ -1,6 +1,6 @@
 # Swift5
-### -  Practice Language
-###### &emsp; Swift의 문법 및 특성을 보여주는 코드
+### - Language
+###### &emsp; Swift로 다른 언어의 자료형 및 함수를 구현
 
 ### - Algorithm
 ###### &emsp; 3학년 2학기 알고리즘 과제로 제출했던 파이썬 코드를 Swift로 리팩터링
