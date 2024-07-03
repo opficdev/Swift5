@@ -31,8 +31,9 @@ class Queue<T>{
         }
     }
     
-    
-    var isEmpty: Bool {return self.head == nil && self.tail == nil}
+    var isEmpty: Bool {
+        return self.head == nil && self.tail == nil
+    }
     
     ///Get head
     var first: T?{
