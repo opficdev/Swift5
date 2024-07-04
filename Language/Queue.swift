@@ -7,8 +7,8 @@
 
 import Foundation
 
-class Queue<T>{
-    class node<t>{
+struct Queue<T>{
+    private class node<t>{
         var data: t? = nil, front: node? = nil, back: node? = nil //front: head쪽으로 가는 다음 노드 / back: tail쪽으로 가는 다음 노드
         init(){}
         init(_ data: t){
@@ -45,9 +45,9 @@ class Queue<T>{
     }
         
     ///Input data into queue.
-    func append(_ data: T){
+    mutating func append(_ data: T){
         self.count += 1
-        let newNode = node(data)
+        var newNode = node(data)
         if self.isEmpty{
             self.head = newNode
             self.tail = self.head
@@ -60,7 +60,7 @@ class Queue<T>{
     }
     
     ///Get data from queue.
-    func remove(){
+    mutating func remove(){
         if !self.isEmpty{
             self.head = self.head!.back
             self.head?.front = nil
@@ -72,7 +72,7 @@ class Queue<T>{
     }
     
     ///Get data from queue and remove last node.
-    func pop() -> T?{
+    mutating func pop() -> T?{
         let data = first
         remove()
         return data
