@@ -7,23 +7,6 @@
 
 import Foundation
 
-struct pair<T: Comparable>: Comparable{
-    var first: T
-    var second: T
-    init(_ first: T,_ second: T){
-        self.first = first
-        self.second = second
-    }
-    
-    static func < (p0: pair<T>, p1: pair<T>) -> Bool{
-        if p0.first != p1.first{
-            return p0.first < p1.first
-        }
-        return p0.second < p1.second
-    }
-}
-
-
 class SegTree{
     private var data: [pair<Int>] = []
     init(_ size: Int){
