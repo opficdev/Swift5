@@ -14,7 +14,7 @@ struct Deque<T>{
         return leftarr.isEmpty && rightarr.isEmpty
     }
     
-    mutating func append(_ t:T){
+    mutating func append(_ t:T){ //구조체(값 타입)의 값을 변경하기 위해선 mutating 함수가 필요
         rightarr.append(t)
     }
     
