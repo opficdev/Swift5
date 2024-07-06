@@ -114,28 +114,18 @@ struct PriorityQueue<T1: Comparable>{
         }
     }
 
-    
     private var heap: Heap<T1>
+    
     init(by: @escaping (T1, T1) -> Bool = (<)){
         self.heap = Heap(comparator: by)
     }
+    
     init(_ data: T1, by: @escaping (T1, T1) -> Bool = (<)){
         self.heap = Heap(data, comparator: by)
     }
+    
     init(_ data: [T1], by: @escaping (T1, T1) -> Bool = (<)){
         self.heap = Heap(data, comparator: by)
-    }
-    
-    mutating func append(_ newElement: T1){
-        self.heap.append(newElement)
-    }
-    
-    mutating func remove(){
-        self.heap.remove()
-    }
-    
-    mutating func pop() -> T1?{
-        return self.heap.pop()
     }
     
     var top: T1?{
@@ -148,6 +138,18 @@ struct PriorityQueue<T1: Comparable>{
     
     var count: Int{
         return self.heap.count
+    }
+    
+    mutating func append(_ newElement: T1){
+        self.heap.append(newElement)
+    }
+    
+    mutating func remove(){
+        self.heap.remove()
+    }
+    
+    mutating func pop() -> T1?{
+        return self.heap.pop()
     }
 }
 
