@@ -47,7 +47,7 @@ struct Queue<T>{
     ///Input data into queue.
     mutating func append(_ data: T){
         self.count += 1
-        var newNode = node(data)
+        let newNode = node(data)
         if self.isEmpty{
             self.head = newNode
             self.tail = self.head
