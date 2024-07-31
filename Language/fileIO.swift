@@ -1,5 +1,6 @@
 import Foundation
 
+///A class used to read files using fileHandle.
 class FileReader{
     private let fileHandle: FileHandle
     private let fileURL: URL
@@ -44,33 +45,12 @@ class FileReader{
             munmap(pointer, fileSize)
         }
     }
-
-    func read(_ bytes: Int) -> String? {
-        guard let pointer = mappedPointer else { return nil }
-        let remainingBytes = fileSize - currentOffset
-        let bytesToRead = min(bytes, remainingBytes)
-
-        guard bytesToRead > 0 else { return nil }
-
-        let data = Data(bytes: pointer.advanced(by: currentOffset), count: bytesToRead)
-        currentOffset += bytesToRead
-        return String(data: data, encoding: .utf8)
-    }
     
-    func read() -> String? {
-        guard let pointer = mappedPointer else { return nil }
-        return String(data: Data(bytes: pointer.advanced(by: 0), count: fileSize), encoding: .utf8)
-    }
-    
-    func seek(to offset: Int) {
+    private func seek(to offset: Int) {
         currentOffset = min(max(0, offset), fileSize)
     }
-
-    var isEOF: Bool {
-        return currentOffset >= fileSize
-    }
-
-    func readLine() -> String? {
+    
+    private func readLineHelper() -> String?{
         guard let pointer = mappedPointer, !isEOF else { return nil }
 
         var lineEnd = currentOffset
@@ -92,14 +72,58 @@ class FileReader{
         currentOffset = min(lineEnd + 1, fileSize) // Move past the newline
         return line
     }
+    
+    ///Get current EOF or not.
+    var isEOF: Bool {
+        return currentOffset >= fileSize
+    }
+
+    ///Read n bytes of file.
+    func read(_ bytes: Int) -> String? {
+        guard let pointer = mappedPointer else { return nil }
+        let remainingBytes = fileSize - currentOffset
+        let bytesToRead = min(bytes, remainingBytes)
+
+        guard bytesToRead > 0 else { return nil }
+
+        let data = Data(bytes: pointer.advanced(by: currentOffset), count: bytesToRead)
+        currentOffset += bytesToRead
+        return String(data: data, encoding: .utf8)
+    }
+    
+    ///Read all file.
+    func read() -> String? {
+        guard let pointer = mappedPointer else { return nil }
+        return String(data: Data(bytes: pointer.advanced(by: 0), count: fileSize), encoding: .utf8)
+    }
+    
+    ///Read 1 line of file.
+    func readLine(readAll: Bool = false) -> String { //readAll = true: 아무 내용없는 줄도 내용 있다고 판별
+        var line: String?
+        
+        if let initialLine = readLineHelper() {
+            line = initialLine
+            
+            if !readAll && line == ""{
+                repeat {
+                    if let nextLine = readLineHelper(), nextLine != "" {
+                        line = nextLine
+                    }
+                } while line == ""
+            } 
+        }
+        return line ?? ""
+    }
 }
 
+///A class used to write file using String.
 class FileWriter{
     private let fileURL: URL
     init(_ fileName: String, _ path: String = #file){
         self.fileURL = URL(fileURLWithPath: path).deletingLastPathComponent().appendingPathComponent(fileName)
     }
     
+    ///Write a date to file.
     func write(_ data: Any){
         do {
             let data = String(describing: data)
