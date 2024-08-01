@@ -83,6 +83,5 @@ struct Queue<T>{
         while !isEmpty{
             remove()
         }
-        count = 0
     }
 }
