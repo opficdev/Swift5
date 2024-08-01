@@ -53,4 +53,11 @@ struct Deque<T>{
         }
         return leftarr.popLast()!
     }
+    
+    mutating func removeAll(){
+        leftarr.removeAll(keepingCapacity: false)
+        rightarr.removeAll(keepingCapacity: false)
+        leftindex = 0
+        rightindex = 0
+    }
 }
