@@ -77,4 +77,12 @@ struct Queue<T>{
         remove()
         return data
     }
+    
+    ///Remove all elements from queue.
+    mutating func removeAll(){
+        while !isEmpty{
+            remove()
+        }
+        count = 0
+    }
 }
