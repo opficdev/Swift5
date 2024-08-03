@@ -7,81 +7,91 @@
 
 import Foundation
 
-struct Queue<T>{
-    private class node<t>{
-        var data: t? = nil, front: node? = nil, back: node? = nil //front: head쪽으로 가는 다음 노드 / back: tail쪽으로 가는 다음 노드
-        init(){}
-        init(_ data: t){
-            self.data = data
-        }
-    }
-    //output node
-    private var head: node<T>? = nil
-    //input node
-    private var tail: node<T>? = nil
+
+///An ordered, non-random-access collection.
+struct Queue<Element>{
+    private var arr = [Element?]() //  Array to save data
+    private var front = 0   //  Point the first element's index
+    private var back = 0    //  Point the last element's index
+    private var _count = 0   //  Counts of elements
     
-    var count = 0
-    
-    ///Only declaration.
+    ///Creates a new, empty queue.
     init(){}
-    ///Declaration with input datas.
-    init(_ datas: [T]){
-        for data in datas{
-            append(data)
+    
+    ///Creates a queue, containing the elements of a sequence.
+    init<S: Sequence>(_ s: S) where S.Element == Element{
+        arr = Array(s)
+        _count = arr.count
+        back = _count - 1
+    }
+    
+    ///Add a new element at the begin of the queue.
+    mutating func append(_ newElement: Element){
+        if _count == arr.count{
+            arr.append(nil)
         }
-    }
-    
-    var isEmpty: Bool {
-        return self.head == nil && self.tail == nil
-    }
-    
-    ///Get head
-    var first: T?{
-        return self.head?.data
-    }
-    ///Get tail
-    var last: T?{
-        return self.tail?.data
-    }
         
-    ///Input data into queue.
-    mutating func append(_ data: T){
-        self.count += 1
-        let newNode = node(data)
-        if self.isEmpty{
-            self.head = newNode
-            self.tail = self.head
-        }
-        else{
-            newNode.front = self.tail
-            self.tail!.back = newNode
-            self.tail = newNode
-        }
+        back = (back + 1) % arr.count
+        arr[back] = newElement
+        _count += 1
     }
     
-    ///Get data from queue.
-    mutating func remove(){
-        if !self.isEmpty{
-            self.head = self.head!.back
-            self.head?.front = nil
-            if self.head == nil{
-                self.tail = nil
-            }
-            self.count -= 1
+    @discardableResult  //  @discardableResult: Don't show warning if don't use function's return value
+    ///Removes and returns the first element of queue.
+    mutating func removeFirst() -> Element{
+        guard let element = popFirst() else{
+            fatalError(": Can't Element remove last element from an empty collection")
         }
+        return element
     }
     
-    ///Get data from queue and remove last node.
-    mutating func pop() -> T?{
-        let data = first
-        remove()
-        return data
+    ///Removes all elements from the queue.
+    mutating func removeAll(keepingCapacity:Bool = false){
+        arr.removeAll(keepingCapacity: keepingCapacity)
+        _count = 0
+        front = 0
+        back = 0
     }
     
-    ///Remove all elements from queue.
-    mutating func removeAll(){
-        while !isEmpty{
-            remove()
+    @discardableResult
+    ///Removes and returns the first element of queue.
+    mutating func popFirst() -> Element?{
+        guard _count > 0 else { return nil }
+                
+        let element = arr[front]
+        arr[front] = nil
+        
+        front = (front + 1) % arr.count
+        _count -= 1
+        
+        if count <= arr.count / 2 && arr.count > 1 {
+            arr = Array(arr[front...back])
+            front = 0
+            back = count - 1
         }
+        
+        return element
+    }
+    
+    ///The first element of the collection.
+    var first: Element?{
+        return _count == 0 ? nil : arr[front]
+    }
+    
+    ///The last element of the collection.
+    var last: Element?{
+        return _count == 0 ? nil : arr[back]
+    }
+    
+    var isEmpty: Bool{
+        return arr.isEmpty
+    }
+    
+    var count: Int{
+        return _count
+    }
+    
+    var capacity: Int{
+        return arr.count
     }
 }
