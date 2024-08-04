@@ -36,11 +36,11 @@ struct Queue<Element>{
         _count += 1
     }
     
-    @discardableResult  //  @discardableResult: Don't show warning if don't use function's return value
     ///Removes and returns the first element of queue.
+    @discardableResult  //  @discardableResult: Don't show warning if don't use function's return value
     mutating func removeFirst() -> Element{
         guard let element = popFirst() else{
-            fatalError(": Can't Element remove last element from an empty collection")
+            fatalError(": Can't remove last element from an empty collection")
         }
         return element
     }
@@ -53,8 +53,8 @@ struct Queue<Element>{
         back = 0
     }
     
-    @discardableResult
     ///Removes and returns the first element of queue.
+    @discardableResult
     mutating func popFirst() -> Element?{
         guard _count > 0 else { return nil }
                 
