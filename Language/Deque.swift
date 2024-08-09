@@ -1,63 +1,118 @@
-struct Deque<T>{
-    private var leftarr:[T] = [] //left 연산 담당하는 배열
-    private var rightarr:[T] = [] //right 연산 담당하는 배열
-    private var leftindex = 0
-    private var rightindex = 0
-    
-    init(){}
-    
-    init(_ item: [T]){
-        rightarr = item
+import Foundation
+
+///An ordered, non-random-access collection.
+struct Deque<Element> {
+    private var array: [Element?]
+    private var head = 0
+    ///The total number of elements that the array can contain without allocating new storage.
+    private(set) var capacity = 10
+    ///The number of elements in the deque.
+    private(set) var count = 0
+
+    ///Creates a new, empty deque.
+    init() {
+        array = [Element?](repeating: nil, count: capacity)
     }
     
-    var isEmpty: Bool{
-        return leftarr.isEmpty && rightarr.isEmpty
+    ///Creates a deque, containing the elements of a sequence.
+    init<S: Sequence>(_ s: S) where S.Element == Element{
+        array = Array(s)
+        count = array.count
+        capacity = count
     }
     
-    mutating func append(_ t:T){ //구조체(값 타입)의 값을 변경하기 위해선 mutating 함수가 필요
-        rightarr.append(t)
-    }
-    
-    mutating func appendleft(_ t:T){
-        leftarr.append(t)
-    }
-    
-    mutating func pop() -> T?{
-        if isEmpty{
-            return nil
+    private mutating func resize() {
+        let newCapacity = capacity * 2
+        var newArray = [Element?](repeating: nil, count: newCapacity)
+        for i in 0..<count {
+            newArray[i] = array[(head + i) % capacity]
         }
-        else if rightarr.isEmpty {
-            let item = leftarr[leftindex]
-            leftindex += 1
-            if leftindex == leftarr.count{
-                leftarr = []
-                leftindex = 0
-            }
-            return item
-        }
-        return rightarr.popLast()!
+        array = newArray
+        head = 0
+        capacity = newCapacity
     }
     
-    mutating func popleft() -> T?{
-        if isEmpty{
-            return nil
+    ///Remove all elements of from the deque.
+    mutating func removeAll(_ keepingCapacity: Bool = true) {
+        capacity = keepingCapacity ? capacity : 10
+        array = [Element?](repeating: nil, count: capacity)
+        head = 0
+        count = 0
+    }
+
+    ///Add a new element at the end of the deque.
+    mutating func append(_ newElement: Element) {
+        if count == capacity {
+            resize()
         }
-        else if leftarr.isEmpty {
-            let item = rightarr[rightindex]
-            rightindex += 1
-            if rightindex == rightarr.count{
-                rightarr = []
-                rightindex = 0
-            }
-            return item
+        array[(head + count) % capacity] = newElement
+        count += 1
+    }
+
+    ///Add a new element at the begin of the deque.
+    mutating func prepend(_ newElement: Element) {
+        if count == capacity {
+            resize()
         }
-        return leftarr.popLast()!
+        head = (head - 1 + capacity) % capacity
+        array[head] = newElement
+        count += 1
     }
     
-    mutating func removeAll(){
-        leftarr.removeAll(keepingCapacity: false)
-        rightarr.removeAll(keepingCapacity: false)
-        leftindex = 0
-        rightindex = 0
+    ///Removes and returns the first element of deque.
+    @discardableResult
+    mutating func removeFirst() -> Element{
+        guard let element = popFirst() else{
+            fatalError(": Can'Element remove first element from an empty collection")
+        }
+        return element
+    }
+    
+    ///Removes and returns the last element of deque.
+    @discardableResult
+    mutating func removeLast() -> Element{
+        guard let element = popLast() else{
+            fatalError(": Can'Element remove last element from an empty collection")
+        }
+        return element
+    }
+    
+    ///Removes and returns the first element of deque.
+    @discardableResult
+    mutating func popFirst() -> Element? {
+        guard !isEmpty else { return nil }
+        let element = array[head]
+        array[head] = nil
+        head = (head + 1) % capacity
+        count -= 1
+        return element
+    }
+    
+    ///Removes and returns the last element of deque.
+    @discardableResult
+    mutating func popLast() -> Element? {
+        guard !isEmpty else { return nil }
+        count -= 1
+        let index = (head + count) % capacity
+        let element = array[index]
+        array[index] = nil
+        return element
+    }
+    
+    ///The first element of the collection.
+    var first: Element? {
+        guard !isEmpty else { return nil }
+        return array[head]
+    }
+
+    ///The last element of the collection.
+    var last: Element? {
+        guard !isEmpty else { return nil }
+        return array[(head + count - 1) % capacity]
+    }
+    
+    ///A Boolean value indicating whether the collection is empty.
+    var isEmpty: Bool {
+        return count == 0
     }
 }
