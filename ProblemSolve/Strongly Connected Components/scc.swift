@@ -1,3 +1,10 @@
+//
+//  scc.swift
+//  Swift5
+//
+//  Created by 최윤진 on 2024-08-10.
+//
+
 import Foundation
 
 class Graph{
@@ -23,7 +30,7 @@ class Graph{
         return dfs(src, des, &adj, &vis)
     }
     
-    func findSCC(_ n:Int, _ a: inout [[Int]]) -> Int{
+    func findSCC(_ n:Int, _ a: inout [[Int]]) -> String{
         var ans = 0
         var is_scc: [Int] = Array(repeating: 0, count: n)
         var adj: [[Int]] = Array(repeating: Array(), count: n)
@@ -44,17 +51,25 @@ class Graph{
                 ans += 1
             }
         }
-        return ans
+        return "\(ans)"
     }
 }
 
 
-let g = Graph()
-let nm = readLine()!.split(separator: " ").map{Int($0)!}; var n = nm[0], m = nm[1]
-var edges:[[Int]] = []
-for _ in 0..<m{
-    let ij = readLine()!.split(separator: " ").map{Int($0)!}
-    edges.append(ij)
+@main
+struct Main{
+    static func main(){
+        let fin = FileReader("scc.inp")!
+        let fout = FileWriter("scc.out")
+    
+        let g = Graph()
+        let nm = fin.readLine().split(separator: " ").map{Int($0)!}; var n = nm[0], m = nm[1]
+        var edges:[[Int]] = []
+        for _ in 0..<m{
+            let ij = fin.readLine().split(separator: " ").map{Int($0)!}
+            edges.append(ij)
+        }
+        let res = g.findSCC(n, &edges)
+        fout.write(res + "\n")
+    }
 }
-var ans = g.findSCC(n, &edges)
-print(ans)
