@@ -3,21 +3,24 @@ import Foundation
 @main
 struct Main{
     static func main(){
-        var answer = "\n"
-        for _ in 0..<Int(readLine()!)!{
-            let inp = readLine()!.split(separator: " ").map{String($0)}
+        let fin = FileReader("double.inp")!
+        let fout = FileWriter("double.out")
+        
+        var res = ""
+        for _ in 0..<Int(fin.readLine()!)!{
+            let inp = fin.readLine()!.split(separator: " ").map{String($0)}
             let n = NSDecimalNumber(string: inp[0])
             let op = inp[1]
             let m = NSDecimalNumber(string: inp[2])
             
             if op == "+"{
-                answer += n.adding(m).stringValue
+                res += n.adding(m).stringValue
             }
             else if op == "-"{
-                answer += n.subtracting(m).stringValue
+                res += n.subtracting(m).stringValue
             }
             else if op == "*"{
-                answer += n.multiplying(by: m).stringValue
+                res += n.multiplying(by: m).stringValue
             }
             else{
                 let tmp = n.dividing(by: m).stringValue
@@ -25,18 +28,18 @@ struct Main{
                 if tmp.contains("."){
                     let _tmp = tmp[tmp.startIndex..<tmp.firstIndex(of: ".")!]
                     if _tmp == "0" || _tmp == "-0"{
-                        answer += "0"
+                        res += "0"
                     }
                     else{
-                        answer += _tmp
+                        res += _tmp
                     }
                 }
                 else{
-                    answer += tmp
+                    res += tmp
                 }
             }
-            answer += "\n"
+            res += "\n"
         }
-        print(answer)
+        fout.write(res)
     }
 }
