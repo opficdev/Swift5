@@ -98,21 +98,22 @@ class FileReader{
     }
     
     ///Read 1 line of file.
-    func readLine(readAll: Bool = false) -> String { //readAll = true: 아무 내용없는 줄도 내용 있다고 판별
+    func readLine(readAll: Bool = false) -> String? { //readAll = true: 아무 내용없는 줄도 내용 있다고 판별
         var line: String?
         
         if let initialLine = readLineHelper() {
             line = initialLine
             
-            if !readAll && line == ""{
-                repeat {
-                    if let nextLine = readLineHelper(), nextLine != "" {
-                        line = nextLine
+            if !readAll && line == ""{  
+                while let nextLine = readLineHelper(){
+                    line = nextLine
+                    if line != ""{
+                        break
                     }
-                } while line == ""
-            } 
+                }
+            }
         }
-        return line ?? ""
+        return line
     }
 }
 
