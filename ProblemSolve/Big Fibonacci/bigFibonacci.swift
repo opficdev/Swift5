@@ -73,12 +73,15 @@ func fibo(_ n: UInt64) -> UInt64{
 @main
 struct Main{
     static func main(){
-        var answer = "\n"
-        let T = Int(readLine()!)!
+        let fin = FileReader("bigFibonacci.inp")!
+        let fout = FileWriter("bigFibonacci.out")
+        
+        var res = ""
+        let T = Int(fin.readLine()!)!
         for _ in 0..<T{
-            let n = UInt64(readLine()!)!
-            answer += "\(n) \(extraDiv(fibo(n)))\n"
+            let n = UInt64(fin.readLine()!)!
+            res += "\(n) \(extraDiv(fibo(n)))\n"
         }
-        print(answer)
+        fout.write(res)
     }
 }
