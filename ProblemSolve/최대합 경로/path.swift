@@ -24,6 +24,7 @@ extension ArraySlice where Element: Comparable{
     }
 }
 
+@discardableResult
 func Path(_ pre: [Int], _ val: [Int], _ left: Int, _ right: Int, _ res: inout Int) -> Int{
     if left > right {
         return Int.min / 3
@@ -53,17 +54,20 @@ func Path(_ pre: [Int], _ val: [Int], _ left: Int, _ right: Int, _ res: inout In
 @main
 struct Main{
     static func main(){
-        var RES = "\n"
-        let T = Int(readLine()!)!
+        let fin = FileReader("path.inp")!
+        let fout = FileWriter("path.out")
+        
+        var res = ""
+        let T = Int(fin.readLine()!)!
         for _ in 0..<T{
-            let n = Int(readLine()!)!
-            let inOrder:[Int] = readLine()!.split(separator: " ").map{Int($0)!}
-            let preOrder:[Int] = readLine()!.split(separator: " ").map{Int($0)!}
+            let n = Int(fin.readLine()!)!
+            let inOrder:[Int] = fin.readLine()!.split(separator: " ").map{Int($0)!}
+            let preOrder:[Int] = fin.readLine()!.split(separator: " ").map{Int($0)!}
             
-            var res = -10001
-            Path(preOrder, inOrder, 0, n - 1, &res)
-            RES += String(res) + "\n"
+            var _res = -10001
+            Path(preOrder, inOrder, 0, n - 1, &_res)
+            res += "\(_res)\n"
         }
-        print(RES)
+        fout.write(res)
     }
 }
