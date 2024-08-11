@@ -57,15 +57,18 @@ func Init(){
 @main
 struct Main{
     static func main(){
-        let T = Int(readLine()!)!
-        var result = ""
+        let fin = FileReader("show.inp")!
+        let fout = FileWriter("show.out")
+        
+        let T = Int(fin.readLine()!)!
+        var res = ""
         for _ in 0..<T{
-            let kN = readLine()!.split(separator: " ").map{Int($0)!}
+            let kN = fin.readLine()!.split(separator: " ").map{Int($0)!}
             k = kN[0]; N = kN[1]
             Init()
             var flag = false
             for _ in 0..<N{
-                let NC = readLine()!.split(separator: " ").map{String($0)}
+                let NC = fin.readLine()!.split(separator: " ").map{String($0)}
                 var n0 = Int(NC[0])!, n1 = Int(NC[2])!, n2 = Int(NC[4])!;
                 let c0 = NC[1], c1 = NC[3], c2 = NC[5];
                 
@@ -93,9 +96,13 @@ struct Main{
                 }
             }
             
-            if flag {result += "-1\n"; print(-1)}
-            else {result += "1\n"; print(1)}
+            if flag {
+                res += "-1\n"
+            }
+            else {
+                res += "1\n"
+            }
         }
-//        print(result)
+        fout.write(res)
     }
 }
