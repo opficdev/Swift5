@@ -46,30 +46,33 @@ func orderToBracket(_ arr: [Int], _ no: inout Int, _ left: Int, _ right: Int) ->
 @main
 struct Main{
     static func main(){
-        let T = Int(readLine()!)!
-        var answer = "\n"
+        let fin = FileReader("transform.inp")!
+        let fout = FileWriter("transform.out")
+        
+        var res = ""
+        let T = Int(fin.readLine()!)!
         for _ in 0..<T{
-            let nk = readLine()!.split(separator: " ").map{Int($0)!}
+            let nk = fin.readLine()!.split(separator: " ").map{Int($0)!}
             let n = nk[0], k = nk[1]
-            answer += "\(n) "
+            res += "\(n) "
             if (k == 1){
-                let str = readLine()!;
+                let str = fin.readLine()!;
                 var no = 0
                 let tmp = bracketToOrder(str, &no, 0, 2 * n - 1)
                 for i in 0..<tmp.count{
-                    answer += String(tmp[i])
+                    res += "\(tmp[i])"
                     if i < tmp.count - 1{
-                        answer += " "
+                        res += " "
                     }
                 }
-                answer += "\n"
+                res += "\n"
             }
             else{
-                let arr = readLine()!.split(separator: " ").map{Int($0)!}
+                let arr = fin.readLine()!.split(separator: " ").map{Int($0)!}
                 var no = 0
-                answer += orderToBracket(arr, &no, 0, n - 1) + "\n"
+                res += orderToBracket(arr, &no, 0, n - 1) + "\n"
             }
         }
-        print(answer)
+        fout.write(res)
     }
 }
