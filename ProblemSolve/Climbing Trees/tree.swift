@@ -131,7 +131,7 @@ struct Main{
         var str = [String]()
         
         while true{
-            str = fin.readLine().split(separator: " ").map{String($0)}
+            str = fin.readLine()!.split(separator: " ").map{String($0)}
             if str[0] == "no.child"{
                 break
             }
@@ -152,8 +152,7 @@ struct Main{
             }
         }
         
-        while !fin.isEOF{
-            str = fin.readLine().split(separator: " ").map{String($0)}
+        while let str = fin.readLine()?.split(separator: " ").map({String($0)}){
             if !str_map.keys.contains(str[0]) || !str_map.keys.contains(str[1]){
                 res += "no relation\n"
                 continue
