@@ -49,57 +49,68 @@ func isStraightFlush(_ arr: [Int], _ Arr: [[Bool]]) -> Bool {
     return false;
 }
 
-let T: Int = Int(readLine()!)!
-for _ in 0..<T{
-    var Arr: [[Bool]] = Array(repeating: Array(repeating: false, count: 14), count: 4)
-    var tTmap: Dictionary<String, Int> = [
-        "S": 0, "D": 0, "H": 0, "C": 0
-    ]
-    var arr: [Int] = Array(repeating: 0, count: 14)
-    
-    let TN: [String] = readLine()!.split(separator: " ").map{ String($0) }
-    for tn in TN{
-        let t: String = String(tn[tn.startIndex]), n: String = String(tn[tn.index(after: tn.startIndex)])
-        tTmap[t]! += 1
-        for _n in Nmap[n]!{
-            Arr[Tmap[t]!][_n - 1] = true
-        }
-    }
-    
-    for i in 0..<4{
-        for j in 0..<14{
-            if (Arr[i][j]){
-                arr[j] += 1
+
+@main
+struct Main{
+    static func main(){
+        let fin = FileReader("poker.inp")!
+        let fout = FileWriter("poker.out")
+        
+        var res = ""
+        let T = Int(fin.readLine()!)!
+        for _ in 0..<T{
+            var Arr: [[Bool]] = Array(repeating: Array(repeating: false, count: 14), count: 4)
+            var tTmap: Dictionary<String, Int> = [
+                "S": 0, "D": 0, "H": 0, "C": 0
+            ]
+            var arr: [Int] = Array(repeating: 0, count: 14)
+            
+            let TN: [String] = fin.readLine()!.split(separator: " ").map{ String($0) }
+            for tn in TN{
+                let t: String = String(tn[tn.startIndex]), n: String = String(tn[tn.index(after: tn.startIndex)])
+                tTmap[t]! += 1
+                for _n in Nmap[n]!{
+                    Arr[Tmap[t]!][_n - 1] = true
+                }
+            }
+            
+            for i in 0..<4{
+                for j in 0..<14{
+                    if (Arr[i][j]){
+                        arr[j] += 1
+                    }
+                }
+            }
+            
+            
+            if (isStraightFlush(arr, Arr)){
+                res += "Straight Flush\n"
+            }
+            else if (findPairs(arr, Arr, 4, 1)){
+                res += "Four Card\n"
+            }
+            else if (findPairs(arr, Arr, 3, 1) && findPairs(arr, Arr, 2, 2)){
+                res += "Full House\n"
+            }
+            else if (isFlush(tTmap)){
+                res += "Flush\n"
+            }
+            else if (isStraight(arr)){
+                res += "Straight\n"
+            }
+            else if (findPairs(arr, Arr, 3, 1)){
+                res += "Triple\n"
+            }
+            else if (findPairs(arr, Arr, 2, 2)){
+                res += "Two Pair\n"
+            }
+            else if (findPairs(arr, Arr, 2, 1)){
+                res += "One Pair\n"
+            }
+            else{
+                res += "Top\n"
             }
         }
-    }
-    
-    
-    if (isStraightFlush(arr, Arr)){
-        print("Straight Flush")
-    }
-    else if (findPairs(arr, Arr, 4, 1)){
-        print("Four Card")
-    }
-    else if (findPairs(arr, Arr, 3, 1) && findPairs(arr, Arr, 2, 2)){
-        print("Full House")
-    }
-    else if (isFlush(tTmap)){
-        print("Flush")
-    }
-    else if (isStraight(arr)){
-        print("Straight")
-    }
-    else if (findPairs(arr, Arr, 3, 1)){
-        print("Triple")
-    }
-    else if (findPairs(arr, Arr, 2, 2)){
-        print("Two Pair")
-    }
-    else if (findPairs(arr, Arr, 2, 1)){
-        print("One Pair")
-    }
-    else{
-        print("Top")
+        fout.write(res)
     }
 }
